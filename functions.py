@@ -41,17 +41,29 @@ def isDirected(Graph):
             break
     return True
 
-def delete_edges(G,time_start,end_time): #remove edges which are not in the time lapse
-    edge_to_drop=[]
+# def delete_edges(G,time_start,end_time): #remove edges which are not in the time lapse
+#     edge_to_drop=[]
     
-    for u,v,att in G.edges(data=True):
-        if not time_start <= att['t'] <= end_time:
-            edge_to_drop.append((u, v))
-    [G.remove_edge(u,v) for (u,v) in set(edge_to_drop)]
-    return G
+#     for u,v,att in G.edges(data=True):
+#         if not time_start <= att['timestamp'] <= end_time:
+#             edge_to_drop.append((u, v))
+#     [G.remove_edge(u,v) for (u,v) in set(edge_to_drop)]
+#     return G
+def timestamp_conversion(date):
+    date = int(time.mktime(datetime.datetime.strptime(date, "%Y/%m/%d").timetuple()))
+    return date
 
+def delete_edges(G,time_start,end_time):
+    start = timestamp_conversion(time_start)
+    end = timestamp_conversion(end_time)
+    edges = [(u,v,d) for u,v,d in G.edges(data = True) if (start < d['timestamp'][0] < end)]
+    H = nx.DiGraph()
+    H.add_edges_from(edges)
+    return H
+
+        
 def defineTime(myTime):#return the time in seconds
-    myTime = time.mktime(t_end.timetuple())
+    myTime = time.mktime(myTime.timetuple())
     return myTime
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -159,3 +171,29 @@ def allShortestPathsWithV(G,start, goal, v):
             
         
     return len(all_path)
+
+### visualization 2
+# Python3 code to demonstrate working of
+# Convert date range to N equal durations
+# Using loop
+def equi_intervals(start_date, end_date, N):
+    # initializing dates
+    test_date1 = datetime.datetime.strptime(start_date, '%Y/%m/%d')
+    test_date2 = datetime.datetime.strptime(end_date, '%Y/%m/%d')
+
+    N = N
+    temp = []
+
+    # getting diff.
+    diff = ( test_date2 - test_date1) // N
+    for idx in range(0, N):
+
+        # computing new dates
+        temp.append((test_date1 + idx * diff))
+
+    res = []
+    for sub in temp:
+        res.append(sub.strftime("%Y/%m/%d"))
+
+    # printing result
+    return res + [end_date]
