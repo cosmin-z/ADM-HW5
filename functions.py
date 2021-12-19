@@ -41,19 +41,20 @@ def isDirected(Graph):
             break
     return True
 
-def delete_edges(G,time_start,end_time): #remove edges which are not in the interval
+def delete_edges(G,time_start,end_time): #remove edges which are not in the time lapse
     edge_to_drop=[]
     
     for u,v,att in G.edges(data=True):
         if not time_start <= att['t'] <= end_time:
             edge_to_drop.append((u, v))
-    [G.remove_edge(u,v) for (u,v) in edge_to_drop]
+    [G.remove_edge(u,v) for (u,v) in set(edge_to_drop)]
     return G
 
-def defineTime(myTime):
+def defineTime(myTime):#return the time in seconds
     myTime = time.mktime(t_end.timetuple())
     return myTime
 
+#-------------------------------------------------------------------------------------------------------------------
 def Dijkstra_SP(Graph, source, target):
     
     dist = {node : float('infinity') for node in list(nx.nodes(Graph))} # dict of the distances from each node to source
@@ -98,6 +99,13 @@ def Dijkstra_SP(Graph, source, target):
     path.reverse()
 
     return dist[target],path # return the distance
+
+#find a user which isn't in both graph
+def findSpecialUser(G,H):
+    for node in G.nodes():
+        if not H.has_node(node):
+            return node
+    raise ValueError('A very specific bad thing happened.')
 
 
 
